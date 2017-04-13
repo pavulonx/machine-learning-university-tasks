@@ -14,7 +14,7 @@ def sigmoid(x):
     :param x: wektor wejsciowych wartosci Nx1
     :return: wektor wyjściowych wartości funkcji sigmoidalnej dla wejścia x, Nx1
     '''
-    return 1/(1+np.exp(-x))
+    return 1 / (1 + np.exp(-x))
 
 
 def logistic_cost_function(w, x_train, y_train):
@@ -24,7 +24,12 @@ def logistic_cost_function(w, x_train, y_train):
     :param y_train: ciag treningowy - wyjscia Nx1
     :return: funkcja zwraca krotke (val, grad), gdzie val oznacza wartosc funkcji logistycznej, a grad jej gradient po w
     '''
-    pass
+    sigma = sigmoid(x_train @ w)
+    N = y_train.shape[0]
+    p_D_w = np.prod((sigma ** y_train) * ((1 - sigma) ** (1 - y_train)))
+    L_w = -np.log(p_D_w) / N
+    grad = - (x_train.transpose() @ (y_train - sigma)) / N
+    return L_w, grad
 
 
 def gradient_descent(obj_fun, w0, epochs, eta):
@@ -36,7 +41,14 @@ def gradient_descent(obj_fun, w0, epochs, eta):
     :return: funkcja wykonuje optymalizacje metoda gradientu prostego dla funkcji obj_fun. Zwraca krotke (w,func_values),
     gdzie w oznacza znaleziony optymalny punkt w, a func_valus jest wektorem wartosci funkcji [epochs x 1] we wszystkich krokach algorytmu
     '''
-    pass
+    w = w0
+    wA = []
+    _, grad = obj_fun(w0)
+    for i in range(epochs):
+        w = w - eta * grad
+        val, grad = obj_fun(w)
+        wA.append(val)
+    return w, np.array(wA).reshape(epochs, 1)
 
 
 def stochastic_gradient_descent(obj_fun, x_train, y_train, w0, epochs, eta, mini_batch):
@@ -65,7 +77,14 @@ def regularized_logistic_cost_function(w, x_train, y_train, regularization_lambd
     :return: funkcja zwraca krotke (val, grad), gdzie val oznacza wartosc funkcji logistycznej z regularyzacja l2,
     a grad jej gradient po w
     '''
-    pass
+    w_0 = np.copy(w)
+    w_0[0] = 0
+    N = y_train.shape[0]
+    sigma = sigmoid(x_train @ w)
+    p_D_w = np.prod((sigma ** y_train) * ((1 - sigma) ** (1 - y_train)))
+    L_w_l = -np.log(p_D_w) / N + regularization_lambda / 2 * np.linalg.norm(w_0) ** 2
+    grad = - (x_train.transpose() @ (y_train - sigma)) / N + regularization_lambda * w_0
+    return L_w_l, grad
 
 
 def prediction(x, w, theta):
@@ -76,7 +95,7 @@ def prediction(x, w, theta):
     :return: funkcja wylicza wektor y o wymiarach Nx1. Wektor zawiera wartosci etykiet ze zbioru {0,1} dla obserwacji z x
      bazujac na modelu z parametrami w oraz progu klasyfikacji theta
     '''
-    pass
+    return np.apply_along_axis(arr=sigmoid(x @ w), func1d=lambda arg: arg >= theta, axis=1)
 
 
 def f_measure(y_true, y_pred):
@@ -85,7 +104,10 @@ def f_measure(y_true, y_pred):
     :param y_pred: wektor etykiet przewidzianych przed model Nx1
     :return: funkcja wylicza wartosc miary F
     '''
-    pass
+    N = y_true.shape[0]
+    TP = np.count_nonzero(y_true & y_pred)
+    F = np.count_nonzero(np.bitwise_xor(y_true, y_pred))
+    return 2 * TP / (2 * TP + F)
 
 
 def model_selection(x_train, y_train, x_val, y_val, w0, epochs, eta, mini_batch, lambdas, thetas):
