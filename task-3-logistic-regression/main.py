@@ -8,10 +8,10 @@ import pickle
 import numpy as np
 from utils import hog
 from time import sleep
-from zadanie3.test import TestRunner
-from zadanie3.content import (sigmoid, logistic_cost_function, gradient_descent,
-                              stochastic_gradient_descent, regularized_logistic_cost_function,
-                              prediction, f_measure, model_selection)
+from test import TestRunner
+from content import (sigmoid, logistic_cost_function, gradient_descent,
+                     stochastic_gradient_descent, regularized_logistic_cost_function,
+                     prediction, f_measure, model_selection)
 
 PICKLE_FILE_PATH = 'data.pkl'
 TEST_FILE_PATH = 'test_data.pkl'
@@ -21,6 +21,7 @@ PATCH_WIDTH = 92
 PATCH_HEIGHT = 112
 STEP = 20
 marker_positions = []
+
 
 def load_test():
     with open(TEST_FILE_PATH, 'rb') as f:
@@ -70,6 +71,7 @@ def plot_theta_lambda(F_vals, theta_vals, lambda_vals):
     plt.draw()
     plt.waitforbuttonpress(0)
 
+
 def face_detect_patch(patch, w, theta):
     patch = patch / 255.0
     hog_patch = hog(patch)
@@ -85,7 +87,7 @@ def get_patch(img, x, y):
 def animate(i, ax, patch, patch_positions, img, w, theta):
     markers = []
     for position in marker_positions:
-        markers.append(patches.Rectangle(position, PATCH_WIDTH, PATCH_HEIGHT, fill=False, color='g',linewidth=3))
+        markers.append(patches.Rectangle(position, PATCH_WIDTH, PATCH_HEIGHT, fill=False, color='g', linewidth=3))
 
     for marker in markers:
         ax.add_patch(marker)
@@ -101,7 +103,7 @@ def animate(i, ax, patch, patch_positions, img, w, theta):
     if face_detect_patch(cut_out, w, theta):
         marker_position = [x, img_size[0] - PATCH_HEIGHT - y]
         marker_positions.append(marker_position)
-        marker = patches.Rectangle(marker_position, PATCH_WIDTH, PATCH_HEIGHT, fill=False, color='g',linewidth=3)
+        marker = patches.Rectangle(marker_position, PATCH_WIDTH, PATCH_HEIGHT, fill=False, color='g', linewidth=3)
         ax.add_patch(marker)
         markers.append(marker)
 
@@ -120,7 +122,7 @@ def animate_face_detect(w, theta):
     ax.xaxis.set_tick_params(labelbottom=False, labeltop=False, top=False, bottom=False)
     ax.yaxis.set_tick_params(left=False, labelleft=False)
 
-    patch = patches.Rectangle((PATCH_WIDTH, PATCH_HEIGHT), 100, 120, fill=False, color='r',linewidth=3)
+    patch = patches.Rectangle((PATCH_WIDTH, PATCH_HEIGHT), 100, 120, fill=False, color='r', linewidth=3)
 
     ax.imshow(img, extent=[0, img.shape[1], 0, img.shape[0]], aspect='auto', interpolation="bicubic")
     ax.add_patch(patch)
@@ -133,7 +135,7 @@ def animate_face_detect(w, theta):
     fargs = [ax, patch, patch_positions, img, w, theta]
     anim = animation.FuncAnimation(fig, animate,
                                    fargs=fargs,
-                                   #init_func=self.initialize_animation,
+                                   # init_func=self.initialize_animation,
                                    frames=200,
                                    interval=2,
                                    blit=True, repeat=False)
@@ -150,7 +152,6 @@ def run_unittests():
 
 
 def run_training():
-
     data = load_data()
 
     print('----------Uczenie regresji logistycznej metodą gradientu prostego--------')
@@ -172,7 +173,7 @@ def run_training():
 
     w_0 = np.zeros([data['x_train'].shape[1], 1])
     w_computed2, f_values2 = stochastic_gradient_descent(logistic_cost_function, data['x_train'],
-                                                       data['y_train'], w_0, EPOCHS, eta, MINIBATCH_SIZE)
+                                                         data['y_train'], w_0, EPOCHS, eta, MINIBATCH_SIZE)
 
     print('Wartość funkcji celu na końcu: {:.4f}'.format(f_values2[-1][0]))
     print('\n--- Wcisnij klawisz, aby kontynuowac ---')
@@ -197,7 +198,6 @@ def run_training():
 
     print('\n------------------------DETEKCJA TWARZY-------------------------------\n')
     animate_face_detect(w_computed, t)
-
 
 
 if __name__ == "__main__":

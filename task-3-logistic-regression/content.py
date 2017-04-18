@@ -65,7 +65,19 @@ def stochastic_gradient_descent(obj_fun, x_train, y_train, w0, epochs, eta, mini
     gdzie w oznacza znaleziony optymalny punkt w, a func_values jest wektorem wartosci funkcji [epochs x 1] we wszystkich krokach algorytmu. Wartosci
     funkcji do func_values sa wyliczane dla calego zbioru treningowego!
     '''
-    pass
+    N = y_train.shape[0]
+    M = N // mini_batch
+    x_mini_batch = np.vsplit(x_train, M)
+    y_mini_batch = np.vsplit(y_train, M)
+
+    w = w0
+    wA = []
+    for i in range(epochs):
+        for x, y in zip(x_mini_batch, y_mini_batch):
+            _, grad = obj_fun(w, x, y)
+            w = w - eta * grad
+        wA.append(obj_fun(w, x_train, y_train)[0])
+    return w, np.array(wA).reshape(epochs, 1)
 
 
 def regularized_logistic_cost_function(w, x_train, y_train, regularization_lambda):
@@ -127,4 +139,14 @@ def model_selection(x_train, y_train, x_val, y_val, w0, epochs, eta, mini_batch,
     Dodatkowo funkcja zwraca macierz F, ktora zawiera wartosci miary F dla wszystkich par (lambda, theta). Do uczenia nalezy
     korzystac z algorytmu SGD oraz kryterium uczenia z regularyzacja l2.
     '''
-    pass
+    F = np.zeros(shape=(len(lambdas), len(thetas)))
+    max_f = [0, 0, 0, -1]
+    for i, λ in enumerate(lambdas):
+        obj_fun = lambda w, x, y: regularized_logistic_cost_function(w, x, y, λ)
+        w, func_values = stochastic_gradient_descent(obj_fun, x_train, y_train, w0, epochs, eta, mini_batch)
+        for j, θ in enumerate(thetas):
+            f = f_measure(y_val, prediction(x_val, w, θ))
+            F[i, j] = f
+            if f > max_f[3]: max_f = [λ, θ, w, f]
+    max_f[3] = F
+    return tuple(max_f)
