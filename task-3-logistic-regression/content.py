@@ -7,6 +7,7 @@
 # --------------------------------------------------------------------------
 
 import numpy as np
+from scipy.special import expit
 
 
 def sigmoid(x):
@@ -14,7 +15,8 @@ def sigmoid(x):
     :param x: wektor wejsciowych wartosci Nx1
     :return: wektor wyjściowych wartości funkcji sigmoidalnej dla wejścia x, Nx1
     '''
-    return 1 / (1 + np.exp(-x))
+    # return 1 / (1 + np.exp(-x))
+    return expit(x)
 
 
 def logistic_cost_function(w, x_train, y_train):
